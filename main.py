@@ -23,36 +23,37 @@ db: List[Usuario] = [
     ),
 ]
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-# -------------------------------
-# Endpoints de usuario
-# -------------------------------
-
+# -------------------
+# Listar o buscar usuarios
+# -------------------
 @app.get("/api/v1/users")
 async def get_users(primerNombre: Optional[str] = None):
     """
-    Lista todos los usuarios o busca por nombre si se pasa el parámetro 'primerNombre'.
+    Listar todos los usuarios o buscar por nombre si se pasa 'primerNombre'.
     """
     if primerNombre:
-        resultado = [user for user in db if user.primerNombre.lower() == primerNombre.lower()]
+        resultado = [u for u in db if u.primerNombre.lower() == primerNombre.lower()]
         if not resultado:
             raise HTTPException(status_code=404, detail="Usuario no encontrado")
         return resultado
     return db
 
+# -------------------
+# Crear usuario
+# -------------------
 @app.post("/api/v1/users")
 async def create_user(usuario: Usuario):
     """
     Crear un nuevo usuario.
     """
-    usuario.id = uuid4()  
+    usuario.id = uuid4()
     db.append(usuario)
     return usuario
 
-@app.put("/api/v1/users/{user_id}")
+# -------------------
+# Actualizar usuario
+# -------------------
+@app.put("/api/v1/users")
 async def update_user(user_id: UUID, usuario: Usuario):
     """
     Actualizar un usuario existente por ID.
@@ -64,7 +65,10 @@ async def update_user(user_id: UUID, usuario: Usuario):
             return usuario
     raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
-@app.delete("/api/v1/users/{user_id}")
+# -------------------
+# Eliminar usuario
+# -------------------
+@app.delete("/api/v1/users")
 async def delete_user(user_id: UUID):
     """
     Eliminar un usuario por ID.
